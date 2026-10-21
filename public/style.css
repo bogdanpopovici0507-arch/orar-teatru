@@ -49,15 +49,13 @@ body {
   min-height: 100vh;
 }
 
-/* Header & Navigation */
+/* Header & Navigation - NOT sticky so it never blocks typing or inputs */
 header.app-header {
   background: linear-gradient(135deg, #4a0e1e 0%, #8b1e3f 60%, #a8284e 100%);
   color: #ffffff;
-  padding: 1.5rem 1rem;
-  box-shadow: 0 4px 20px rgba(74, 14, 30, 0.25);
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  padding: 1rem 1rem;
+  box-shadow: 0 2px 12px rgba(74, 14, 30, 0.15);
+  position: relative;
 }
 
 .header-container {
@@ -886,4 +884,40 @@ table.data-table tbody tr:hover {
 
 .print-header {
   display: none;
+}
+
+/* Mobile & Typing optimizations */
+.form-group input,
+.form-group select,
+.form-group textarea {
+  scroll-margin-top: 30px;
+}
+
+@media (max-width: 640px) {
+  header.app-header {
+    padding: 0.65rem 0.75rem;
+  }
+  .brand-icon {
+    font-size: 1.5rem;
+    padding: 0.35rem;
+    border-radius: 8px;
+  }
+  .brand-text h1 {
+    font-size: 1.15rem;
+  }
+  .brand-text p {
+    font-size: 0.78rem;
+  }
+  .nav-tab-btn {
+    padding: 0.45rem 0.75rem;
+    font-size: 0.82rem;
+  }
+  main.container {
+    margin: 1rem auto;
+    padding: 0 0.65rem;
+  }
+  .card {
+    padding: 1.15rem 1rem;
+    border-radius: 12px;
+  }
 }
