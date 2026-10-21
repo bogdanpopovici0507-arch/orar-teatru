@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panou Special Profesor - Orar Teatru</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f8fafc;
+    }
+    .login-container {
+      max-width: 440px;
+      margin: 4rem auto;
+      padding: 0 1rem;
+    }
+    .login-card {
+      background: #ffffff;
+      border: 1px solid var(--slate-200);
+      border-radius: var(--border-radius-lg);
+      padding: 2.25rem 2rem;
+      box-shadow: var(--shadow-lg);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-wrapper">
+        <div class="brand-icon">🎭</div>
+        <div class="brand-text">
+          <h1>Panou Special Profesor & Administrare</h1>
+          <p>Orar Teatru / Teatru de Revistă</p>
+        </div>
+      </div>
+      <div id="header-auth-actions" style="display: none; align-items: center; gap: 0.65rem;">
+        <span class="badge" style="background: rgba(255,255,255,0.2); color: #fff; font-size: 0.82rem; padding: 0.35rem 0.7rem;">
+          👤 Profesor Coordonator
+        </span>
+        <button class="btn btn-secondary btn-sm" onclick="openChangePasswordModal()" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.25);">
+          🔑 Schimbă Parola
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="handleLogout()" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.25);">
+          🚪 Deconectare
+        </button>
+        <a href="/" target="_blank" class="btn btn-secondary btn-sm" style="background: #ffffff; color: var(--primary);">
+          👁️ Vezi Site Public
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container">
+
+    <!-- ========================================== -->
+    <!-- VIEW 1: LOGIN CARD (Dacă nu e autentificat) -->
+    <!-- ========================================== -->
+    <div id="view-login" class="login-container">
+      <div class="login-card">
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+          <div style="font-size: 2.75rem; line-height: 1; margin-bottom: 0.75rem;">🔐</div>
+          <h2 style="font-size: 1.4rem; color: var(--slate-900); font-weight: 800;">Autentificare Profesor</h2>
+          <p style="font-size: 0.88rem; color: var(--slate-600); margin-top: 0.25rem;">
+            Introduceți parola pentru a accesa catalogul elevilor și gestionarea grupelor.
+          </p>
+        </div>
+
+        <form id="login-form" onsubmit="handleLoginSubmit(event)">
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label for="admin-password-input">Parolă de acces:</label>
+            <div style="position: relative;">
+              <input type="password" id="admin-password-input" required placeholder="Introduceți parola..." style="padding-right: 2.5rem;" autocomplete="current-password">
+              <button type="button" onclick="togglePasswordVisibility('admin-password-input')" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--slate-400); font-size: 1.1rem;">
+                👁️
+              </button>
+            </div>
+          </div>
+
+          <div id="login-error-msg" style="display: none; background: var(--danger-bg); color: var(--danger); padding: 0.65rem 0.85rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem;"></div>
+
+          <button type="submit" id="login-btn" class="btn btn-primary" style="width: 100%; padding: 0.8rem; font-size: 1rem;">
+            Intră în Panou
+          </button>
+
+          <div style="margin-top: 1.25rem; text-align: center; font-size: 0.82rem; color: var(--slate-500); background: var(--slate-50); padding: 0.75rem; border-radius: 8px; border: 1px dashed var(--slate-200);">
+            💡 <strong>Notă inițială:</strong> Parola implicită este <code>teatru123</code> (o puteți schimba oricând după logare).
+          </div>
+        </form>
+      </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- VIEW 2: DASHBOARD (Când este autentificat) -->
+    <!-- ========================================== -->
+    <div id="view-dashboard" style="display: none;">
+
+      <!-- Print Header (shown only when printing) -->
+      <div class="print-header">
+        <h1>Orar Teatru / Teatru de Revistă</h1>
+        <h2>Catalog Înscrieri Elevi & Situație Grupe</h2>
+        <p id="print-date"></p>
+      </div>
+
+      <!-- Admin Top Summary Stats -->
+      <div class="stats-grid no-print">
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div>
+            <div class="stat-value" id="stat-total-students">0</div>
+            <div class="stat-label">Total Elevi Înscriși</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">🎭</div>
+          <div>
+            <div class="stat-value" id="stat-total-capacity">0 / 160</div>
+            <div class="stat-label">Locuri Ocupate</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">⏳</div>
+          <div>
+            <div class="stat-value" id="stat-spots-left">160</div>
+            <div class="stat-label">Locuri Rămase Libere</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">🏆</div>
+          <div>
+            <div class="stat-value" id="stat-full-groups">0</div>
+            <div class="stat-label">Grupe Complete (16/16)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-tabs Navigation -->
+      <div class="card no-print" style="padding: 0.85rem 1.25rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn btn-secondary btn-sm" id="btn-subtab-catalog" onclick="switchAdminSubtab('catalog')" style="background: var(--slate-100); font-weight: 700;">
+            📋 Catalog Elevi (Ordine Alfabetică)
+          </button>
+          <button class="btn btn-secondary btn-sm" id="btn-subtab-notices" onclick="switchAdminSubtab('notices')">
+            ⚙️ Gestionare Grupe & Anunțuri Speciale
+          </button>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn btn-secondary btn-sm" onclick="exportCSV()">
+            📥 Descarcă Excel (CSV)
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="window.print()">
+            🖨️ Tipărește Catalog
+          </button>
+          <button class="btn btn-primary btn-sm" onclick="openAddStudentModal()">
+            ➕ Adaugă Elev Manual
+          </button>
+        </div>
+      </div>
+
+      <!-- Subtab 1: Students Catalog Table -->
+      <div id="admin-subtab-catalog" class="card">
+        <div class="card-header no-print">
+          <div>
+            <h2 class="card-title">
+              <span>📋</span> Lista Elevilor Înscriși
+            </h2>
+            <p style="font-size: 0.85rem; color: var(--slate-500); margin-top: 3px;">
+              Elevii sunt afișați în <strong>ordine alfabetică</strong> după nume și prenume. Puteți căuta, filtra pe grupă sau tipări catalogul.
+            </p>
+          </div>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="admin-toolbar no-print">
+          <div class="admin-search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="admin-search" placeholder="Căutare după nume, prenume sau telefon..." oninput="handleAdminSearch()">
+          </div>
+
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+            <label for="filter-group-select" style="font-size: 0.88rem; font-weight: 600; color: var(--slate-600);">Filtru Grupă:</label>
+            <select id="filter-group-select" onchange="loadAdminStudents()" style="padding: 0.5rem 0.8rem; border-radius: 8px; border: 1.5px solid var(--slate-200); font-size: 0.88rem;">
+              <option value="all">Toate grupele (Toți elevii)</option>
+              <option value="1">Grupa 1 (Luni 14:00-15:40 - Cls. 0-6)</option>
+              <option value="2">Grupa 2 (Luni 16:20-18:00 - Cls. 7-12)</option>
+              <option value="3">Grupa 3 (Marți 09:50-11:30 - Cls. 0-12)</option>
+              <option value="4">Grupa 4 (Marți 13:00-14:40 - Cls. 0-6)</option>
+              <option value="5">Grupa 5 (Marți 14:50-16:30 - Cls. 7-12)</option>
+              <option value="6">Grupa 6 (Miercuri 13:30-15:10 - Cls. 0-6)</option>
+              <option value="7">Grupa 7 (Miercuri 16:20-18:00 - Cls. 0-6)</option>
+              <option value="8">Grupa 8 (Joi 14:00-15:40 - Cls. 0-6)</option>
+              <option value="9">Grupa 9 (Joi 15:50-17:30 - Cls. 7-12)</option>
+              <option value="10">Grupa 10 (Vineri 09:50-11:30 - Cls. 0-12)</option>
+            </select>
+
+            <label for="sort-select" style="font-size: 0.88rem; font-weight: 600; color: var(--slate-600); margin-left: 0.5rem;">Sortare:</label>
+            <select id="sort-select" onchange="loadAdminStudents()" style="padding: 0.5rem 0.8rem; border-radius: 8px; border: 1.5px solid var(--slate-200); font-size: 0.88rem;">
+              <option value="alpha">Ordine Alfabetică (A - Z)</option>
+              <option value="group">Pe Grupe (Grupa 1 -> 10)</option>
+              <option value="grade">După Clasă</option>
+              <option value="date">Cele mai recente înscrieri</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-responsive">
+          <table class="data-table" id="students-table">
+            <thead>
+              <tr>
+                <th style="width: 45px;">Nr.</th>
+                <th>Nume Elev</th>
+                <th>Prenume Elev</th>
+                <th>Clasa</th>
+                <th>Telefon Părinte</th>
+                <th>Grupa Înscrisă</th>
+                <th>Ziua & Orarul</th>
+                <th>Data Înscrierii</th>
+                <th class="no-print" style="width: 110px; text-align: center;">Acțiuni</th>
+              </tr>
+            </thead>
+            <tbody id="students-table-body">
+              <tr>
+                <td colspan="9" style="text-align: center; padding: 2.5rem; color: var(--slate-500);">
+                  Se încarcă catalogul...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Subtab 2: Group Notices & Special Restrictions -->
+      <div id="admin-subtab-notices" class="card" style="display: none;">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">
+              <span>⚙️</span> Gestionare Anunțuri & Mențiuni Speciale pe Grupe
+            </h2>
+            <p style="font-size: 0.88rem; color: var(--slate-600); margin-top: 4px;">
+              Puteți adăuga note sau restricții personalizate pentru fiecare grupă în parte. 
+              De exemplu: <em>„Această grupă este destinată exclusiv elevilor de la Școala Gimnazială Nr. 12”</em>. 
+              Mesajul salvat va apărea imediat evidențiat pe căsuța grupei respective din formularul părinților!
+            </p>
+          </div>
+        </div>
+
+        <div id="admin-groups-container" class="admin-groups-list">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+
+  <!-- ========================================== -->
+  <!-- MODALS                                     -->
+  <!-- ========================================== -->
+
+  <!-- Modal: Edit Student -->
+  <div class="modal-backdrop" id="modal-edit-student">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">✏️ Modificare Date Elev</h3>
+        <button class="modal-close" onclick="closeEditModal()">&times;</button>
+      </div>
+      <form id="edit-student-form" onsubmit="handleEditStudentSubmit(event)">
+        <div class="modal-body">
+          <input type="hidden" id="edit-student-id">
+
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label for="edit-last-name">Nume Elev: <span class="required">*</span></label>
+            <input type="text" id="edit-last-name" required>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label for="edit-first-name">Prenume Elev: <span class="required">*</span></label>
+            <input type="text" id="edit-first-name" required>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+            <div class="form-group">
+              <label for="edit-class-grade">Clasa:</label>
+              <select id="edit-class-grade" required>
+                <option value="0">Clasa Pregătitoare (0)</option>
+                <option value="1">Clasa I (1)</option>
+                <option value="2">Clasa a II-a (2)</option>
+                <option value="3">Clasa a III-a (3)</option>
+                <option value="4">Clasa a IV-a (4)</option>
+                <option value="5">Clasa a V-a (5)</option>
+                <option value="6">Clasa a VI-a (6)</option>
+                <option value="7">Clasa a VII-a (7)</option>
+                <option value="8">Clasa a VIII-a (8)</option>
+                <option value="9">Clasa a IX-a (9)</option>
+                <option value="10">Clasa a X-a (10)</option>
+                <option value="11">Clasa a XI-a (11)</option>
+                <option value="12">Clasa a XII-a (12)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="edit-class-letter">Litera:</label>
+              <input type="text" id="edit-class-letter" maxlength="5">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label for="edit-parent-phone">Număr Telefon Părinte: <span class="required">*</span></label>
+            <input type="tel" id="edit-parent-phone" required>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label for="edit-group-id">Grupa repartizată:</label>
+            <select id="edit-group-id" required>
+              <!-- Filled by JS -->
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-notes">Observații interne (vizibile doar profesorului):</label>
+            <textarea id="edit-notes" rows="2" placeholder="Ex: adus acord părinte, rol atribuit etc."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Anulează</button>
+          <button type="submit" class="btn btn-primary">Salvează Modificările</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Add Student Manually -->
+  <div class="modal-backdrop" id="modal-add-student">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">➕ Adăugare Elev în Catalog de către Profesor</h3>
+        <button class="modal-close" onclick="closeAddStudentModal()">&times;</button>
+      </div>
+      <form id="add-student-form" onsubmit="handleAddStudentSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label for="add-last-name">Nume Elev: <span class="required">*</span></label>
+            <input type="text" id="add-last-name" required placeholder="Nume de familie">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label for="add-first-name">Prenume Elev: <span class="required">*</span></label>
+            <input type="text" id="add-first-name" required placeholder="Prenume">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+            <div class="form-group">
+              <label for="add-class-grade">Clasa: <span class="required">*</span></label>
+              <select id="add-class-grade" required>
+                <option value="0">Clasa Pregătitoare (0)</option>
+                <option value="1">Clasa I (1)</option>
+                <option value="2">Clasa a II-a (2)</option>
+                <option value="3">Clasa a III-a (3)</option>
+                <option value="4">Clasa a IV-a (4)</option>
+                <option value="5">Clasa a V-a (5)</option>
+                <option value="6">Clasa a VI-a (6)</option>
+                <option value="7">Clasa a VII-a (7)</option>
+                <option value="8">Clasa a VIII-a (8)</option>
+                <option value="9">Clasa a IX-a (9)</option>
+                <option value="10">Clasa a X-a (10)</option>
+                <option value="11">Clasa a XI-a (11)</option>
+                <option value="12">Clasa a XII-a (12)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="add-class-letter">Litera:</label>
+              <input type="text" id="add-class-letter" maxlength="5" placeholder="ex: A">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label for="add-parent-phone">Număr Telefon Părinte: <span class="required">*</span></label>
+            <input type="tel" id="add-parent-phone" required placeholder="07xxxxxxxx">
+          </div>
+
+          <div class="form-group">
+            <label for="add-group-id">Grupa repartizată: <span class="required">*</span></label>
+            <select id="add-group-id" required>
+              <!-- Filled by JS -->
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeAddStudentModal()">Anulează</button>
+          <button type="submit" class="btn btn-primary">Înscrie Elevul</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Change Admin Password -->
+  <div class="modal-backdrop" id="modal-change-password">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">🔑 Schimbare Parolă Profesor</h3>
+        <button class="modal-close" onclick="closeChangePasswordModal()">&times;</button>
+      </div>
+      <form id="change-password-form" onsubmit="handleChangePasswordSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label for="pwd-current">Parola Curentă:</label>
+            <input type="password" id="pwd-current" required>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label for="pwd-new">Noua Parolă (minim 4 caractere):</label>
+            <input type="password" id="pwd-new" required minlength="4">
+          </div>
+
+          <div class="form-group">
+            <label for="pwd-confirm">Confirmă Noua Parolă:</label>
+            <input type="password" id="pwd-confirm" required minlength="4">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeChangePasswordModal()">Anulează</button>
+          <button type="submit" class="btn btn-primary">Salvează Noua Parolă</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+
+  <!-- Admin JavaScript -->
+  <script src="admin.js"></script>
+</body>
+</html>
