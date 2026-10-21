@@ -69,10 +69,10 @@ function hashPassword(password) {
   return crypto.createHash('sha256').update((password || '') + 'teatru_salt_2026').digest('hex');
 }
 
-// Default Admin Password ('anaiubi123' if not set)
+// Default Admin Password ('anaiubi123')
 const existingPass = db.prepare("SELECT value FROM admin_settings WHERE key = 'admin_password'").get();
-if (!existingPass) {
-  db.prepare("INSERT INTO admin_settings (key, value) VALUES ('admin_password', ?)").run('anaiubi123');
+if (!existingPass || existingPass.value === 'teatru123') {
+  db.prepare("INSERT OR REPLACE INTO admin_settings (key, value) VALUES ('admin_password', ?)").run('anaiubi123');
 }
 
 // Prepopulate initial groups if empty
