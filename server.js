@@ -69,10 +69,10 @@ function hashPassword(password) {
   return crypto.createHash('sha256').update((password || '') + 'teatru_salt_2026').digest('hex');
 }
 
-// Default Admin Password ('teatru123' if not set)
+// Default Admin Password ('anaiubi123' if not set)
 const existingPass = db.prepare("SELECT value FROM admin_settings WHERE key = 'admin_password'").get();
 if (!existingPass) {
-  db.prepare("INSERT INTO admin_settings (key, value) VALUES ('admin_password', ?)").run('teatru123');
+  db.prepare("INSERT INTO admin_settings (key, value) VALUES ('admin_password', ?)").run('anaiubi123');
 }
 
 // Prepopulate initial groups if empty
@@ -444,7 +444,7 @@ app.post('/api/student/logout', (req, res) => {
 app.post('/api/admin/login', (req, res) => {
   const { password } = req.body;
   const row = db.prepare("SELECT value FROM admin_settings WHERE key = 'admin_password'").get();
-  const currentPassword = row ? row.value : 'teatru123';
+  const currentPassword = row ? row.value : 'anaiubi123';
 
   if (password === currentPassword) {
     const token = crypto.randomBytes(32).toString('hex');
@@ -478,7 +478,7 @@ app.post('/api/admin/logout', (req, res) => {
 app.post('/api/admin/change-password', requireAdminAuth, (req, res) => {
   const { currentPassword, newPassword } = req.body;
   const row = db.prepare("SELECT value FROM admin_settings WHERE key = 'admin_password'").get();
-  const savedPassword = row ? row.value : 'teatru123';
+  const savedPassword = row ? row.value : 'anaiubi123';
 
   if (currentPassword !== savedPassword) {
     return res.status(400).json({ success: false, error: 'Parola curentă este incorectă.' });
@@ -730,6 +730,5 @@ app.listen(PORT, () => {
   console.log(`====================================================`);
   console.log(`🎭 Server Orar Teatru / Teatru de Revistă pornit!`);
   console.log(`🚀 Formular Înscriere & Portal: http://localhost:${PORT}`);
-  console.log(`🔑 Parolă Profesor implicită: teatru123`);
   console.log(`====================================================`);
 });
