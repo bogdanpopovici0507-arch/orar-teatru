@@ -22,12 +22,23 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Check if app is already installed or running in standalone mode
+  updateInstallButtonVisibility();
+
   // PWA Install prompt listener
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     state.deferredPwaPrompt = e;
-    const installBtn = document.getElementById('pwa-install-btn');
-    if (installBtn) installBtn.style.display = 'inline-flex';
+    updateInstallButtonVisibility();
+  });
+
+  // Fired when the app is successfully installed
+  window.addEventListener('appinstalled', () => {
+    localStorage.setItem('pwa_installed', 'true');
+    state.deferredPwaPrompt = null;
+    updateInstallButtonVisibility();
+    showToast('Aplicația a fost instalată cu succes!', 'success');
+    handleNotificationRequest();
   });
 
   const printDateEl = document.getElementById('print-date');
@@ -37,18 +48,38 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+// Detect if running inside installed PWA standalone window or already installed
+function isAppAlreadyInstalled() {
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                       window.navigator.standalone === true || 
+                       document.referrer.includes('android-app://');
+  const isMarkedInstalled = localStorage.getItem('pwa_installed') === 'true';
+  return isStandalone || isMarkedInstalled;
+}
+
+function updateInstallButtonVisibility() {
+  const installBtn = document.getElementById('pwa-install-btn');
+  if (!installBtn) return;
+  if (isAppAlreadyInstalled()) {
+    installBtn.style.display = 'none';
+  } else {
+    installBtn.style.display = 'inline-flex';
+  }
+}
+
 // Trigger PWA Installation via Chrome / Browser prompt or show Guide Modal on unsupported browsers (like Arc / Safari desktop)
 async function triggerPWAInstall() {
   if (state.deferredPwaPrompt) {
     state.deferredPwaPrompt.prompt();
     const choice = await state.deferredPwaPrompt.userChoice;
     if (choice.outcome === 'accepted') {
+      localStorage.setItem('pwa_installed', 'true');
+      updateInstallButtonVisibility();
       showToast('Aplicația a fost instalată cu succes!', 'success');
-      handleNotificationRequest(); // Ask for notification permission right after install!
+      handleNotificationRequest();
     }
     state.deferredPwaPrompt = null;
   } else {
-    // Show guide modal for browsers like Arc, Safari, or desktop without direct PWA prompt
     openPwaGuideModal();
   }
 }

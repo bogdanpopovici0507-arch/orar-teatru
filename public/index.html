@@ -36,8 +36,8 @@
 
       <!-- Navigation Tabs & PWA Install Button -->
       <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
-        <!-- PWA Install Button (Always visible) -->
-        <button id="pwa-install-btn" class="btn btn-secondary btn-sm" onclick="triggerPWAInstall()" style="background: #ffffff; color: var(--primary); font-weight: 700; border: none; box-shadow: var(--shadow-sm);">
+        <!-- PWA Install Button (Hidden if already installed) -->
+        <button id="pwa-install-btn" class="btn btn-secondary btn-sm" onclick="triggerPWAInstall()" style="display: none; background: #ffffff; color: var(--primary); font-weight: 700; border: none; box-shadow: var(--shadow-sm);">
           📲 Instalează Aplicația
         </button>
 
