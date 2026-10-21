@@ -36,8 +36,8 @@
 
       <!-- Navigation Tabs & PWA Install Button -->
       <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
-        <!-- PWA Install Button (shown when installable) -->
-        <button id="pwa-install-btn" class="btn btn-secondary btn-sm" onclick="triggerPWAInstall()" style="display: none; background: #ffffff; color: var(--primary); font-weight: 700; border: none; box-shadow: var(--shadow-sm);">
+        <!-- PWA Install Button (Always visible) -->
+        <button id="pwa-install-btn" class="btn btn-secondary btn-sm" onclick="triggerPWAInstall()" style="background: #ffffff; color: var(--primary); font-weight: 700; border: none; box-shadow: var(--shadow-sm);">
           📲 Instalează Aplicația
         </button>
 
@@ -256,6 +256,24 @@
                 🚪 Deconectare
               </button>
             </div>
+          </div>
+        </div>
+
+        <!-- Notification Permission Card -->
+        <div id="notification-card" class="card" style="margin-bottom: 1.5rem; background: #f0fdf4; border: 1.5px solid #bbf7d0;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <span style="font-size: 1.8rem;" id="notif-icon">🔔</span>
+              <div>
+                <h4 style="font-size: 0.95rem; font-weight: 700; color: #166534;" id="notif-title">Permisiuni Notificări de la Profesor</h4>
+                <p style="font-size: 0.82rem; color: #15803d; margin-top: 2px;" id="notif-desc">
+                  Activează notificările pentru a primi alerte pe telefon când profesorul adaugă fișe, roluri sau noutăți.
+                </p>
+              </div>
+            </div>
+            <button id="notif-btn" class="btn btn-primary btn-sm" onclick="handleNotificationRequest()" style="background: #15803d; font-weight: 700; border: none;">
+              Activează Notificările
+            </button>
           </div>
         </div>
 
@@ -546,9 +564,12 @@
       <div class="modal-body" id="success-modal-body">
         <!-- Injected by JS -->
       </div>
-      <div class="modal-footer" style="justify-content: center;">
-        <button class="btn btn-primary" onclick="closeSuccessModal()" style="min-width: 180px; padding: 0.75rem 1.5rem; font-size: 1rem;">
-          ✓ Am înțeles / Închide
+      <div class="modal-footer" style="justify-content: center; gap: 0.75rem; flex-wrap: wrap;">
+        <button class="btn btn-primary" onclick="goToMyStudentAccount()" style="padding: 0.75rem 1.4rem; font-size: 1rem;">
+          👤 Deschide Contul Meu Direct
+        </button>
+        <button class="btn btn-secondary" onclick="closeSuccessModal()" style="padding: 0.75rem 1.25rem;">
+          Închide
         </button>
       </div>
     </div>
@@ -793,6 +814,50 @@
           <button type="submit" class="btn btn-primary">Salvează Noua Parolă</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Modal: PWA Installation Guide -->
+  <div class="modal-backdrop" id="modal-pwa-guide">
+    <div class="modal-box" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="display: flex; align-items: center; gap: 0.5rem;">
+          <span>📲</span> Cum instalezi aplicația
+        </h3>
+        <button class="modal-close" onclick="closePwaGuideModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="font-size: 0.92rem; line-height: 1.6; color: var(--slate-700);">
+        <p style="margin-bottom: 1rem; color: var(--slate-800); font-weight: 600;">
+          Pe acest browser (Arc / desktop), sistemul nu permite instalarea automată directă. Pentru a instala aplicația pe ecran:
+        </p>
+
+        <div style="background: var(--slate-50); border: 1.5px solid var(--slate-200); border-radius: 10px; padding: 1rem; margin-bottom: 0.85rem;">
+          <h4 style="color: var(--primary); font-weight: 700; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
+            📱 Pe telefon (Android / Google Chrome):
+          </h4>
+          <p style="font-size: 0.85rem; color: var(--slate-600);">
+            1. Deschideți link-ul în browserul <strong>Google Chrome</strong>.<br>
+            2. Apăsați pe meniul <strong>⋮ (trei puncte)</strong> din colțul din dreapta-sus.<br>
+            3. Alegeți <strong>„Instalează aplicația”</strong> sau <strong>„Adaugă pe ecranul de pornire”</strong>.
+          </p>
+        </div>
+
+        <div style="background: var(--slate-50); border: 1.5px solid var(--slate-200); border-radius: 10px; padding: 1rem;">
+          <h4 style="color: var(--primary); font-weight: 700; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
+            🍏 Pe iPhone / iPad (Safari):
+          </h4>
+          <p style="font-size: 0.85rem; color: var(--slate-600);">
+            1. Deschideți link-ul în browserul <strong>Safari</strong>.<br>
+            2. Apăsați butonul de <strong>Partajare (pătratul cu săgeată în sus ⬆️)</strong>.<br>
+            3. Derulați în jos și selectați <strong>„Adăugare pe ecranul principal”</strong>.
+          </p>
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content: center;">
+        <button class="btn btn-primary" onclick="closePwaGuideModal()" style="min-width: 140px;">
+          ✓ Am înțeles
+        </button>
+      </div>
     </div>
   </div>
 

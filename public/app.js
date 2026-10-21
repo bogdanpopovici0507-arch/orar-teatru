@@ -37,21 +37,30 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// Trigger PWA Installation via Chrome / Browser prompt
+// Trigger PWA Installation via Chrome / Browser prompt or show Guide Modal on unsupported browsers (like Arc / Safari desktop)
 async function triggerPWAInstall() {
-  if (!state.deferredPwaPrompt) {
-    alert('Pentru a instala aplicația:\n- Pe Android/Chrome: apăsați meniul ⋮ și alegeți „Instalează aplicația” sau „Adaugă pe ecranul de pornire”.\n- Pe iPhone/Safari: apăsați butonul de partajare (pătratul cu săgeată) și alegeți „Adăugare pe ecranul principal”.');
-    return;
+  if (state.deferredPwaPrompt) {
+    state.deferredPwaPrompt.prompt();
+    const choice = await state.deferredPwaPrompt.userChoice;
+    if (choice.outcome === 'accepted') {
+      showToast('Aplicația a fost instalată cu succes!', 'success');
+      handleNotificationRequest(); // Ask for notification permission right after install!
+    }
+    state.deferredPwaPrompt = null;
+  } else {
+    // Show guide modal for browsers like Arc, Safari, or desktop without direct PWA prompt
+    openPwaGuideModal();
   }
+}
 
-  state.deferredPwaPrompt.prompt();
-  const choice = await state.deferredPwaPrompt.userChoice;
-  if (choice.outcome === 'accepted') {
-    showToast('Aplicația a fost instalată cu succes pe dispozitiv!', 'success');
-  }
-  state.deferredPwaPrompt = null;
-  const installBtn = document.getElementById('pwa-install-btn');
-  if (installBtn) installBtn.style.display = 'none';
+function openPwaGuideModal() {
+  const modal = document.getElementById('modal-pwa-guide');
+  if (modal) modal.classList.add('show');
+}
+
+function closePwaGuideModal() {
+  const modal = document.getElementById('modal-pwa-guide');
+  if (modal) modal.classList.remove('show');
 }
 
 // Switch Main Tabs (Înscriere vs Cont Elev vs Panou Profesor)
@@ -177,6 +186,11 @@ function renderStudentDashboard(student) {
       </div>
     `;
   }
+
+  // Update notification permission card state
+  if ('Notification' in window) {
+    updateNotificationCardUI(Notification.permission);
+  }
 }
 
 // Student Login Form Submit
@@ -204,6 +218,7 @@ async function handleStudentLoginSubmit(e) {
       state.currentStudent = data.student;
       renderStudentDashboard(data.student);
       showToast(`Bine ai revenit, ${data.student.first_name}!`, 'success');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       errBox.innerText = data.error || 'Autentificare eșuată.';
       errBox.style.display = 'block';
@@ -223,6 +238,81 @@ function handleStudentLogout() {
   state.currentStudent = null;
   showStudentLoginView();
   showToast('Te-ai deconectat din contul de elev.', 'info');
+}
+
+// Open My Account directly after enrollment
+function goToMyStudentAccount() {
+  closeSuccessModal();
+  switchMainTab('student');
+}
+
+// Notification Permission Request & Status Management
+async function handleNotificationRequest() {
+  if (!('Notification' in window)) {
+    showToast('Acest browser nu suportă notificări.', 'error');
+    return;
+  }
+
+  if (Notification.permission === 'granted') {
+    showToast('Notificările sunt deja active!', 'info');
+    updateNotificationCardUI('granted');
+    return;
+  }
+
+  try {
+    const permission = await Notification.requestPermission();
+    updateNotificationCardUI(permission);
+
+    if (permission === 'granted') {
+      showToast('Notificările au fost activate cu succes!', 'success');
+      try {
+        new Notification('🎭 Orar Teatru / Teatru de Revistă', {
+          body: 'Notificările sunt active! Vei primi noutățile și fișele de la profesor aici.',
+          icon: '/icon.svg'
+        });
+      } catch (err) {}
+    } else {
+      showToast('Permisiunea pentru notificări a fost respinsă din browser.', 'info');
+    }
+  } catch (e) {
+    console.error('Notification error:', e);
+  }
+}
+
+function updateNotificationCardUI(permission) {
+  const card = document.getElementById('notification-card');
+  const title = document.getElementById('notif-title');
+  const desc = document.getElementById('notif-desc');
+  const btn = document.getElementById('notif-btn');
+  const icon = document.getElementById('notif-icon');
+  if (!card || !btn) return;
+
+  if (permission === 'granted') {
+    card.style.background = '#f0fdf4';
+    card.style.borderColor = '#86efac';
+    title.innerText = '✅ Notificări Active';
+    desc.innerText = 'Vei primi automat alerte pe ecran când profesorul trimite fișe, roluri sau noutăți.';
+    btn.innerText = 'Notificări Activate (✓)';
+    btn.style.background = '#15803d';
+    btn.disabled = true;
+    if (icon) icon.innerText = '🔔';
+  } else if (permission === 'denied') {
+    card.style.background = '#fef2f2';
+    card.style.borderColor = '#fca5a5';
+    title.innerText = '⚠️ Notificări Blocate în Browser';
+    desc.innerText = 'Pentru a primi notificări, permiteți permisiunea din setările browserului (pictograma de lângă adresa web).';
+    btn.innerText = 'Blocat în Browser';
+    btn.style.background = 'var(--slate-400)';
+    btn.disabled = true;
+  } else {
+    card.style.background = '#f0fdf4';
+    card.style.borderColor = '#bbf7d0';
+    title.innerText = 'Permisiuni Notificări de la Profesor';
+    desc.innerText = 'Activează notificările pentru a primi alerte pe telefon când profesorul adaugă fișe sau roluri.';
+    btn.innerText = 'Activează Notificările';
+    btn.style.background = '#15803d';
+    btn.disabled = false;
+  }
 }
 
 // Student Change Password Modal
