@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Check if app is already installed or running in standalone mode
   updateInstallButtonVisibility();
+  checkStickyNotificationBar();
 
   // PWA Install prompt listener
   window.addEventListener('beforeinstallprompt', (e) => {
@@ -250,6 +251,11 @@ async function handleStudentLoginSubmit(e) {
       renderStudentDashboard(data.student);
       showToast(`Bine ai revenit, ${data.student.first_name}!`, 'success');
       window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // FORCE NOTIFICATION PROMPT IF NOT GRANTED!
+      if ('Notification' in window && Notification.permission !== 'granted') {
+        setTimeout(() => handleForcedNotificationPrompt(), 700);
+      }
     } else {
       errBox.innerText = data.error || 'Autentificare eșuată.';
       errBox.style.display = 'block';
@@ -271,17 +277,69 @@ function handleStudentLogout() {
   showToast('Te-ai deconectat din contul de elev.', 'info');
 }
 
-// Open My Account directly after enrollment
+// Open My Account directly after enrollment & prompt notification
 function goToMyStudentAccount() {
   closeSuccessModal();
   switchMainTab('student');
+  if ('Notification' in window && Notification.permission !== 'granted') {
+    setTimeout(() => handleForcedNotificationPrompt(), 700);
+  }
+}
+
+// Check and update sticky notification bar
+function checkStickyNotificationBar() {
+  const bar = document.getElementById('sticky-notif-bar');
+  if (!bar) return;
+  if ('Notification' in window && Notification.permission !== 'granted') {
+    bar.style.display = 'block';
+  } else {
+    bar.style.display = 'none';
+  }
+}
+
+function handleForcedNotificationPrompt() {
+  const modal = document.getElementById('modal-forced-notification');
+  if (modal) modal.classList.add('show');
+}
+
+function dismissForcedNotificationModal() {
+  const modal = document.getElementById('modal-forced-notification');
+  if (modal) modal.classList.remove('show');
+}
+
+async function executeForcedNotificationPermission() {
+  if (!('Notification' in window)) {
+    showToast('Acest browser nu suportă notificări.', 'error');
+    dismissForcedNotificationModal();
+    return;
+  }
+
+  try {
+    const permission = await Notification.requestPermission();
+    dismissForcedNotificationModal();
+    checkStickyNotificationBar();
+    updateNotificationCardUI(permission);
+
+    if (permission === 'granted') {
+      showToast('Notificările au fost activate cu succes!', 'success');
+      try {
+        new Notification('🎭 Orar Teatru / Teatru de Revistă', {
+          body: 'Notificările sunt active! Vei primi aici fișele și noutățile de la profesor.',
+          icon: '/icon.svg'
+        });
+      } catch (err) {}
+    } else {
+      showToast('Permisiunea a fost refuzată. O poți activa oricând din setările browserului.', 'info');
+    }
+  } catch (err) {
+    dismissForcedNotificationModal();
+  }
 }
 
 // Notification Permission Request & Status Management
 async function handleNotificationRequest() {
-  if (!('Notification' in window)) {
-    showToast('Acest browser nu suportă notificări.', 'error');
-    return;
+  executeForcedNotificationPermission();
+}
   }
 
   if (Notification.permission === 'granted') {

@@ -57,6 +57,16 @@
     </div>
   </header>
 
+  <!-- Sticky Urgent Notification Banner (shown if notifications not granted) -->
+  <div id="sticky-notif-bar" style="display: none; background: #fff7ed; border-bottom: 2px solid #f97316; padding: 0.65rem 1rem; text-align: center; font-size: 0.88rem; color: #9a3412; font-weight: 600;">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: center; gap: 0.75rem; flex-wrap: wrap;">
+      <span>⚠️ <strong>Atenție:</strong> Nu ai notificările activate! Riscă să pierzi fișele și anunțurile profesorului.</span>
+      <button class="btn btn-sm btn-primary" onclick="handleForcedNotificationPrompt()" style="background: #ea580c; border: none; font-weight: 700; padding: 0.35rem 0.95rem;">
+        🔔 Activează Notificările Acum
+      </button>
+    </div>
+  </div>
+
   <!-- Main Container -->
   <main class="container">
 
@@ -853,6 +863,37 @@
         <button class="btn btn-primary" onclick="closePwaGuideModal()" style="min-width: 140px;">
           ✓ Am înțeles
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Forced Notification Prompt (Atenție Sporită) -->
+  <div class="modal-backdrop" id="modal-forced-notification">
+    <div class="modal-box" style="max-width: 460px; text-align: center;">
+      <div class="modal-header" style="background: #fff7ed; border-bottom-color: #ffedd5; justify-content: center;">
+        <h3 class="modal-title" style="color: #9a3412; font-size: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+          <span>🔔</span> Activare Notificări Repetiții
+        </h3>
+      </div>
+      <div class="modal-body" style="padding: 1.75rem 1.5rem;">
+        <div style="font-size: 3.5rem; line-height: 1; margin-bottom: 1rem;">📢</div>
+        <h4 style="font-size: 1.15rem; font-weight: 800; color: var(--slate-900); margin-bottom: 0.5rem;">
+          Este important să activezi notificările!
+        </h4>
+        <p style="font-size: 0.92rem; color: var(--slate-600); line-height: 1.5; margin-bottom: 1.5rem;">
+          Cadrul didactic trimite prin aplicație <strong>fișele de rol, textele de teatru și anunțurile urgente</strong> privind repetițiile. 
+          Pentru a primi aceste mesaje direct pe ecran, apasă butonul de mai jos și dă <strong>Permite (Allow)</strong> în căsuța browserului.
+        </p>
+
+        <button class="btn btn-primary" onclick="executeForcedNotificationPermission()" style="width: 100%; padding: 0.95rem; font-size: 1.05rem; font-weight: 800; background: #15803d; border: none; box-shadow: 0 4px 14px rgba(21, 128, 61, 0.35); cursor: pointer;">
+          🔔 DA, ACTIVEAZĂ NOTIFICĂRILE ACUM
+        </button>
+
+        <div style="margin-top: 0.85rem;">
+          <button type="button" onclick="dismissForcedNotificationModal()" style="background: none; border: none; color: var(--slate-400); font-size: 0.82rem; cursor: pointer; text-decoration: underline;">
+            Am înțeles, mai târziu
+          </button>
+        </div>
       </div>
     </div>
   </div>
