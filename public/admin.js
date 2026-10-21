@@ -401,7 +401,10 @@ function openEditStudentModal(studentId) {
   document.getElementById('edit-student-notice').value = student.student_notice || '';
   document.getElementById('edit-notes').value = student.notes || '';
 
-  document.getElementById('modal-edit-student').classList.add('show');
+  const modal = document.getElementById('modal-edit-student');
+  const body = modal.querySelector('.modal-body');
+  if (body) body.scrollTop = 0;
+  modal.classList.add('show');
 }
 
 function closeEditModal() {
@@ -491,7 +494,10 @@ async function handleResetStudentPwdSubmit(e) {
 
 function openAddStudentModal() {
   document.getElementById('add-student-form').reset();
-  document.getElementById('modal-add-student').classList.add('show');
+  const modal = document.getElementById('modal-add-student');
+  const body = modal.querySelector('.modal-body');
+  if (body) body.scrollTop = 0;
+  modal.classList.add('show');
 }
 
 function closeAddStudentModal() {

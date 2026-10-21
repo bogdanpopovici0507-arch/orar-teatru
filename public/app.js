@@ -338,34 +338,7 @@ async function executeForcedNotificationPermission() {
 
 // Notification Permission Request & Status Management
 async function handleNotificationRequest() {
-  executeForcedNotificationPermission();
-}
-  }
-
-  if (Notification.permission === 'granted') {
-    showToast('Notificările sunt deja active!', 'info');
-    updateNotificationCardUI('granted');
-    return;
-  }
-
-  try {
-    const permission = await Notification.requestPermission();
-    updateNotificationCardUI(permission);
-
-    if (permission === 'granted') {
-      showToast('Notificările au fost activate cu succes!', 'success');
-      try {
-        new Notification('🎭 Orar Teatru / Teatru de Revistă', {
-          body: 'Notificările sunt active! Vei primi noutățile și fișele de la profesor aici.',
-          icon: '/icon.svg'
-        });
-      } catch (err) {}
-    } else {
-      showToast('Permisiunea pentru notificări a fost respinsă din browser.', 'info');
-    }
-  } catch (e) {
-    console.error('Notification error:', e);
-  }
+  await executeForcedNotificationPermission();
 }
 
 function updateNotificationCardUI(permission) {
@@ -908,3 +881,16 @@ function getGradeDisplayName(grade) {
   const romans = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
   return `Clasa a ${romans[grade] || grade}-a (${grade})`;
 }
+
+// Global modal helpers: Close on backdrop click & ESC key
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('modal-backdrop') && e.target.classList.contains('show')) {
+    e.target.classList.remove('show');
+  }
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-backdrop.show').forEach((m) => m.classList.remove('show'));
+  }
+});
