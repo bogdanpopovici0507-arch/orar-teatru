@@ -58,11 +58,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Check if app is already installed or running in standalone mode
+  // Always purge legacy pwa_installed flag so browser tab always displays install button
+  try {
+    localStorage.removeItem('pwa_installed');
+  } catch (err) {}
+
+  // Check if running in standalone mode vs browser
   updateInstallButtonVisibility();
   checkStickyNotificationBar();
 
-  // PWA Install prompt listener
+  // PWA Install prompt listener (captured when Chrome determines installability)
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     state.deferredPwaPrompt = e;
@@ -71,12 +76,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Fired when the app is successfully installed
   window.addEventListener('appinstalled', () => {
-    localStorage.setItem('pwa_installed', 'true');
     state.deferredPwaPrompt = null;
     updateInstallButtonVisibility();
     showToast('Aplicația a fost instalată cu succes!', 'success');
     handleNotificationRequest();
   });
+
+  if (window.matchMedia) {
+    try {
+      window.matchMedia('(display-mode: standalone)').addEventListener('change', updateInstallButtonVisibility);
+    } catch (err) {}
+  }
 
   const printDateEl = document.getElementById('print-date');
   if (printDateEl) {
@@ -85,37 +95,40 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// Detect if running inside installed PWA standalone window or already installed
-function isAppAlreadyInstalled() {
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                       window.navigator.standalone === true || 
-                       document.referrer.includes('android-app://');
-  const isMarkedInstalled = localStorage.getItem('pwa_installed') === 'true';
-  return isStandalone || isMarkedInstalled;
+// Detect if running inside installed PWA standalone window (never use localStorage for installation state)
+function isRunningInStandalone() {
+  const isStandaloneMedia = (window.matchMedia && (
+    window.matchMedia('(display-mode: standalone)').matches || 
+    window.matchMedia('(display-mode: fullscreen)').matches || 
+    window.matchMedia('(display-mode: minimal-ui)').matches
+  ));
+  const isNavigatorStandalone = window.navigator.standalone === true;
+  const isAndroidReferrer = typeof document.referrer === 'string' && document.referrer.includes('android-app://');
+  return !!(isStandaloneMedia || isNavigatorStandalone || isAndroidReferrer);
 }
 
 function updateInstallButtonVisibility() {
   const installBtn = document.getElementById('pwa-install-btn');
   if (!installBtn) return;
-  if (isAppAlreadyInstalled()) {
-    installBtn.style.display = 'none';
+  if (isRunningInStandalone()) {
+    installBtn.style.setProperty('display', 'none', 'important');
   } else {
+    installBtn.style.removeProperty('display');
     installBtn.style.display = 'inline-flex';
   }
 }
 
-// Trigger PWA Installation via Chrome / Browser prompt or show Guide Modal on unsupported browsers (like Arc / Safari desktop)
+// Trigger PWA Installation via Chrome prompt or show Guide Modal on unsupported browsers / desktop Chrome
 async function triggerPWAInstall() {
   if (state.deferredPwaPrompt) {
     state.deferredPwaPrompt.prompt();
     const choice = await state.deferredPwaPrompt.userChoice;
     if (choice.outcome === 'accepted') {
-      localStorage.setItem('pwa_installed', 'true');
-      updateInstallButtonVisibility();
-      showToast('Aplicația a fost instalată cu succes!', 'success');
+      showToast('Aplicația se instalează...', 'success');
       handleNotificationRequest();
     }
     state.deferredPwaPrompt = null;
+    updateInstallButtonVisibility();
   } else {
     openPwaGuideModal();
   }

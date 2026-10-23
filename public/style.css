@@ -130,6 +130,20 @@ header.app-header {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
+/* PWA Install Button */
+#pwa-install-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* Hide PWA Install Button when running inside installed standalone PWA app */
+@media (display-mode: standalone), (display-mode: fullscreen), (display-mode: minimal-ui) {
+  #pwa-install-btn {
+    display: none !important;
+  }
+}
+
 /* Main Container */
 main.container {
   max-width: 1200px;

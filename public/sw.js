@@ -1,12 +1,14 @@
 // Service Worker pentru PWA Orar Teatru
-const CACHE_NAME = 'orar-teatru-v6';
+const CACHE_NAME = 'orar-teatru-v7';
 const ASSETS_TO_CACHE = [
   '/',
   '/style.css',
   '/app.js',
   '/admin.js',
   '/manifest.json',
-  '/icon.svg'
+  '/icon.svg',
+  '/icon-192.png',
+  '/icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {

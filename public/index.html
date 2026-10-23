@@ -11,7 +11,7 @@
   <link rel="icon" href="/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/icon.svg">
   
-  <link rel="stylesheet" href="style.css?v=6">
+  <link rel="stylesheet" href="style.css?v=7">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -36,8 +36,8 @@
 
       <!-- Navigation Tabs & PWA Install Button -->
       <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
-        <!-- PWA Install Button (Hidden if already installed) -->
-        <button id="pwa-install-btn" class="btn btn-secondary btn-sm" onclick="triggerPWAInstall()" style="display: none; background: #ffffff; color: var(--primary); font-weight: 700; border: none; box-shadow: var(--shadow-sm);">
+        <!-- PWA Install Button (Hidden automatically in standalone app mode) -->
+        <button id="pwa-install-btn" class="btn btn-secondary btn-sm" onclick="triggerPWAInstall()" style="background: #ffffff; color: var(--primary); font-weight: 700; border: none; box-shadow: var(--shadow-sm);">
           📲 Instalează Aplicația
         </button>
 
@@ -838,8 +838,18 @@
       </div>
       <div class="modal-body" style="font-size: 0.92rem; line-height: 1.6; color: var(--slate-700);">
         <p style="margin-bottom: 1rem; color: var(--slate-800); font-weight: 600;">
-          Pe acest browser (Arc / desktop), sistemul nu permite instalarea automată directă. Pentru a instala aplicația pe ecran:
+          Dacă fereastra automată de instalare nu a apărut pe ecran, poți instala aplicația manual:
         </p>
+
+        <div style="background: var(--slate-50); border: 1.5px solid var(--slate-200); border-radius: 10px; padding: 1rem; margin-bottom: 0.85rem;">
+          <h4 style="color: var(--primary); font-weight: 700; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
+            💻 Pe calculator / laptop (Google Chrome / Edge):
+          </h4>
+          <p style="font-size: 0.85rem; color: var(--slate-600);">
+            1. În bara de adrese a browserului, în partea dreaptă, apăsați pe pictograma de <strong>Instalare aplicație ⬇️</strong>.<br>
+            2. Sau deschideți meniul <strong>⋮ (trei puncte)</strong> &rarr; <strong>„Instalează Orar Teatru...”</strong> &rarr; <strong>Instalează</strong>.
+          </p>
+        </div>
 
         <div style="background: var(--slate-50); border: 1.5px solid var(--slate-200); border-radius: 10px; padding: 1rem; margin-bottom: 0.85rem;">
           <h4 style="color: var(--primary); font-weight: 700; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
@@ -906,7 +916,7 @@
   <div id="toast-container"></div>
 
   <!-- JavaScript Modules -->
-  <script src="app.js?v=6"></script>
-  <script src="admin.js?v=6"></script>
+  <script src="app.js?v=7"></script>
+  <script src="admin.js?v=7"></script>
 </body>
 </html>
