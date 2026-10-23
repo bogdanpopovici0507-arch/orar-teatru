@@ -1,5 +1,5 @@
 // Service Worker pentru PWA Orar Teatru
-const CACHE_NAME = 'orar-teatru-v5';
+const CACHE_NAME = 'orar-teatru-v6';
 const ASSETS_TO_CACHE = [
   '/',
   '/style.css',

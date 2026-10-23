@@ -10,3 +10,7 @@ services:
         value: 24.0.0
       - key: PORT
         value: 10000
+      - key: TURSO_DATABASE_URL
+        value: libsql://orarteatru-bogdanpopovici0507-arch.aws-eu-north-1.turso.io
+      - key: TURSO_AUTH_TOKEN
+        value: eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3OTI3MjY2NjksImlkIjoiMDFhMTY2ZDUtODgwMS03MDdmLWI2NjctOTRiNzEzMTY5NGY5Iiwia2lkIjoiTWl4ZGlfVDUyTjVLNHVhQng3X2lnendLa25ndXVDMjhwOUlaUV9tZ2NGWSIsInJpZCI6IjU0MzdkZTMwLTVkZWMtNDhlMi1iNDY3LWZiYzczOTJhOGQ0OCJ9.LxkmHAClVo8_BzBnXkDqmJnhYxLStpwEjldrt6cbVT1f9PXUHD8yqx2MkQxxYtk2zfrDsvWLTOFHOvZwXOaRBQ
