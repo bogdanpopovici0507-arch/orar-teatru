@@ -149,7 +149,7 @@ async function loadAdminStudents() {
     }
   } catch (err) {
     if (err.message !== 'Unauthorized') {
-      tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: var(--danger);">Eroare la încărcarea catalogului.</td></tr>';
+      tableBody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: var(--danger);">Eroare la încărcarea catalogului.</td></tr>';
     }
   }
 }
@@ -162,7 +162,7 @@ function renderStudentsTable() {
   if (!students || students.length === 0) {
     tableBody.innerHTML = `
       <tr>
-        <td colspan="9" style="text-align: center; padding: 3rem; color: var(--slate-500);">
+        <td colspan="10" style="text-align: center; padding: 3rem; color: var(--slate-500);">
           <div style="font-size: 2.25rem; margin-bottom: 0.5rem;">🎭</div>
           <strong style="font-size: 1rem; color: var(--slate-700);">Nu există elevi înscriși</strong>
           <p style="font-size: 0.85rem; margin-top: 0.25rem;">Niciun elev nu corespunde filtrelor selectate.</p>
@@ -186,6 +186,11 @@ function renderStudentsTable() {
         <td>
           <span class="badge badge-class" style="font-weight: 700;">
             ${escapeHtml(classDisplay)}
+          </span>
+        </td>
+        <td>
+          <span style="font-size: 0.88rem; font-weight: 600; color: var(--slate-800);">
+            ${escapeHtml(s.school_origin || '-')}
           </span>
         </td>
         <td>
@@ -396,6 +401,7 @@ function openEditStudentModal(studentId) {
   document.getElementById('edit-first-name').value = student.first_name;
   document.getElementById('edit-class-grade').value = student.class_grade;
   document.getElementById('edit-class-letter').value = student.class_letter || '';
+  document.getElementById('edit-school-origin').value = student.school_origin || '';
   document.getElementById('edit-parent-phone').value = student.parent_phone;
   document.getElementById('edit-group-id').value = student.group_id;
   document.getElementById('edit-student-notice').value = student.student_notice || '';
@@ -418,10 +424,16 @@ async function handleEditStudentSubmit(e) {
   const firstName = document.getElementById('edit-first-name').value.trim();
   const classGrade = parseInt(document.getElementById('edit-class-grade').value, 10);
   const classLetter = document.getElementById('edit-class-letter').value.trim();
+  const schoolOrigin = document.getElementById('edit-school-origin').value.trim();
   const parentPhone = document.getElementById('edit-parent-phone').value.trim();
   const groupId = parseInt(document.getElementById('edit-group-id').value, 10);
   const studentNotice = document.getElementById('edit-student-notice').value.trim();
   const notes = document.getElementById('edit-notes').value.trim();
+
+  if (!schoolOrigin) {
+    showToast('Școala de proveniență este obligatorie!', 'error');
+    return;
+  }
 
   try {
     const res = await authFetch(`/api/students/${id}`, {
@@ -432,6 +444,7 @@ async function handleEditStudentSubmit(e) {
         first_name: firstName,
         class_grade: classGrade,
         class_letter: classLetter,
+        school_origin: schoolOrigin,
         parent_phone: parentPhone,
         group_id: groupId,
         student_notice: studentNotice,
@@ -510,8 +523,14 @@ async function handleAddStudentSubmit(e) {
   const firstName = document.getElementById('add-first-name').value.trim();
   const classGrade = parseInt(document.getElementById('add-class-grade').value, 10);
   const classLetter = document.getElementById('add-class-letter').value.trim();
+  const schoolOrigin = document.getElementById('add-school-origin').value.trim();
   const parentPhone = document.getElementById('add-parent-phone').value.trim();
   const groupId = parseInt(document.getElementById('add-group-id').value, 10);
+
+  if (!schoolOrigin) {
+    showToast('Școala de proveniență este obligatorie!', 'error');
+    return;
+  }
 
   try {
     const res = await fetch('/api/register', {
@@ -522,6 +541,7 @@ async function handleAddStudentSubmit(e) {
         first_name: firstName,
         class_grade: classGrade,
         class_letter: classLetter,
+        school_origin: schoolOrigin,
         parent_phone: parentPhone,
         group_id: groupId,
         password: parentPhone.slice(-4) || '1234'

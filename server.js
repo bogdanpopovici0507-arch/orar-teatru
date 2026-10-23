@@ -33,6 +33,7 @@ db.exec(`
     first_name TEXT NOT NULL,
     class_grade INTEGER NOT NULL,
     class_letter TEXT DEFAULT '',
+    school_origin TEXT NOT NULL DEFAULT '',
     parent_phone TEXT NOT NULL,
     group_id INTEGER NOT NULL,
     password_hash TEXT DEFAULT '',
@@ -63,6 +64,7 @@ db.exec(`
 // Add new columns to students if missing in existing table
 try { db.exec('ALTER TABLE students ADD COLUMN password_hash TEXT DEFAULT "";'); } catch (e) {}
 try { db.exec('ALTER TABLE students ADD COLUMN student_notice TEXT DEFAULT "";'); } catch (e) {}
+try { db.exec('ALTER TABLE students ADD COLUMN school_origin TEXT DEFAULT "";'); } catch (e) {}
 
 // Password hash helper
 function hashPassword(password) {
@@ -104,7 +106,13 @@ if (countGroups.cnt === 0) {
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('sw.js') || filePath.endsWith('index.html')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    }
+  }
+}));
 
 // Authentication Helpers
 function verifyAdminSession(token) {
@@ -188,17 +196,22 @@ app.get('/api/groups', (req, res) => {
 // 2. Register student (with optional/recommended password for student login)
 app.post('/api/register', (req, res) => {
   try {
-    let { last_name, first_name, class_grade, class_letter, parent_phone, group_id, password } = req.body;
+    let { last_name, first_name, class_grade, class_letter, school_origin, parent_phone, group_id, password } = req.body;
 
     last_name = (last_name || '').trim();
     first_name = (first_name || '').trim();
     class_letter = (class_letter || '').trim().toUpperCase();
+    school_origin = (school_origin || '').trim();
     parent_phone = (parent_phone || '').trim().replace(/[^0-9+]/g, '');
     group_id = parseInt(group_id, 10);
     const grade = parseInt(class_grade, 10);
 
     if (!last_name || !first_name) {
       return res.status(400).json({ success: false, error: 'Vă rugăm să introduceți numele și prenumele elevului.' });
+    }
+
+    if (!school_origin) {
+      return res.status(400).json({ success: false, error: 'Vă rugăm să introduceți școala de proveniență (câmp obligatoriu).' });
     }
 
     if (isNaN(grade) || grade < 0 || grade > 12) {
@@ -266,10 +279,10 @@ app.post('/api/register', (req, res) => {
 
     // Insert student
     const insert = db.prepare(`
-      INSERT INTO students (last_name, first_name, class_grade, class_letter, parent_phone, group_id, password_hash)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO students (last_name, first_name, class_grade, class_letter, school_origin, parent_phone, group_id, password_hash)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `);
-    const info = insert.run(last_name, first_name, grade, class_letter, parent_phone, group_id, pwdHash);
+    const info = insert.run(last_name, first_name, grade, class_letter, school_origin, parent_phone, group_id, pwdHash);
 
     // Create session token for the student so they are immediately logged in
     const studentToken = crypto.randomBytes(32).toString('hex');
@@ -285,6 +298,7 @@ app.post('/api/register', (req, res) => {
         first_name,
         class_grade: grade,
         class_letter,
+        school_origin,
         parent_phone,
         group_id,
         group_name: group.name,
@@ -325,6 +339,7 @@ app.post('/api/student/login', (req, res) => {
         s.first_name,
         s.class_grade,
         s.class_letter,
+        s.school_origin,
         s.parent_phone,
         s.student_notice,
         s.group_id,
@@ -379,6 +394,7 @@ app.get('/api/student/me', requireStudentAuth, (req, res) => {
         s.first_name,
         s.class_grade,
         s.class_letter,
+        s.school_origin,
         s.parent_phone,
         s.student_notice,
         s.group_id,
@@ -506,6 +522,7 @@ app.get('/api/students', requireAdminAuth, (req, res) => {
         s.first_name,
         s.class_grade,
         s.class_letter,
+        s.school_origin,
         s.parent_phone,
         s.student_notice,
         s.notes,
@@ -527,9 +544,9 @@ app.get('/api/students', requireAdminAuth, (req, res) => {
     }
 
     if (search && search.trim()) {
-      sql += ' AND (LOWER(s.last_name) LIKE ? OR LOWER(s.first_name) LIKE ? OR s.parent_phone LIKE ?)';
+      sql += ' AND (LOWER(s.last_name) LIKE ? OR LOWER(s.first_name) LIKE ? OR s.parent_phone LIKE ? OR LOWER(s.school_origin) LIKE ?)';
       const term = `%${search.trim().toLowerCase()}%`;
-      params.push(term, term, term);
+      params.push(term, term, term, term);
     }
 
     if (sortBy === 'group') {
@@ -586,11 +603,12 @@ app.post('/api/admin/reset-student-password', requireAdminAuth, (req, res) => {
 app.put('/api/students/:id', requireAdminAuth, (req, res) => {
   try {
     const studentId = parseInt(req.params.id, 10);
-    let { last_name, first_name, class_grade, class_letter, parent_phone, group_id, student_notice, notes } = req.body;
+    let { last_name, first_name, class_grade, class_letter, school_origin, parent_phone, group_id, student_notice, notes } = req.body;
 
     last_name = (last_name || '').trim();
     first_name = (first_name || '').trim();
     class_letter = (class_letter || '').trim().toUpperCase();
+    school_origin = (school_origin || '').trim();
     parent_phone = (parent_phone || '').trim();
     student_notice = (student_notice || '').trim();
     notes = (notes || '').trim();
@@ -599,6 +617,10 @@ app.put('/api/students/:id', requireAdminAuth, (req, res) => {
 
     if (!last_name || !first_name) {
       return res.status(400).json({ success: false, error: 'Numele și prenumele sunt obligatorii.' });
+    }
+
+    if (!school_origin) {
+      return res.status(400).json({ success: false, error: 'Școala de proveniență este obligatorie.' });
     }
 
     const group = db.prepare('SELECT * FROM groups_info WHERE id = ?').get(targetGroupId);
@@ -615,9 +637,9 @@ app.put('/api/students/:id', requireAdminAuth, (req, res) => {
 
     db.prepare(`
       UPDATE students 
-      SET last_name = ?, first_name = ?, class_grade = ?, class_letter = ?, parent_phone = ?, group_id = ?, student_notice = ?, notes = ?
+      SET last_name = ?, first_name = ?, class_grade = ?, class_letter = ?, school_origin = ?, parent_phone = ?, group_id = ?, student_notice = ?, notes = ?
       WHERE id = ?
-    `).run(last_name, first_name, grade, class_letter, parent_phone, targetGroupId, student_notice, notes, studentId);
+    `).run(last_name, first_name, grade, class_letter, school_origin, parent_phone, targetGroupId, student_notice, notes, studentId);
 
     res.json({ success: true, message: 'Datele elevului și mențiunile au fost actualizate!' });
   } catch (err) {
@@ -685,6 +707,7 @@ app.get('/api/export-csv', requireAdminAuth, (req, res) => {
         s.first_name,
         s.class_grade,
         s.class_letter,
+        s.school_origin,
         s.parent_phone,
         s.student_notice,
         g.name AS group_name,
@@ -697,7 +720,7 @@ app.get('/api/export-csv', requireAdminAuth, (req, res) => {
     `).all();
 
     let csv = '\uFEFF'; // UTF-8 BOM
-    csv += 'Nr. Crt.;Nume;Prenume;Clasa;Telefon Parinte;Grupa;Zi;Interval Orar;Mentiune Elev;Data Inscrierii\r\n';
+    csv += 'Nr. Crt.;Nume;Prenume;Clasa;Scoala de Provenienta;Telefon Parinte;Grupa;Zi;Interval Orar;Mentiune Elev;Data Inscrierii\r\n';
 
     students.forEach((s, idx) => {
       const clasaDisplay = s.class_grade === 0 ? `Clasa Pregătitoare ${s.class_letter}`.trim() : `Clasa a ${s.class_grade}-a ${s.class_letter}`.trim();
@@ -706,6 +729,7 @@ app.get('/api/export-csv', requireAdminAuth, (req, res) => {
         `"${(s.last_name || '').replace(/"/g, '""')}"`,
         `"${(s.first_name || '').replace(/"/g, '""')}"`,
         `"${clasaDisplay}"`,
+        `"${(s.school_origin || '').replace(/"/g, '""')}"`,
         `"${(s.parent_phone || '')}"`,
         `"${s.group_name}"`,
         `"${s.day}"`,

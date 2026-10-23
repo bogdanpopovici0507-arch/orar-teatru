@@ -15,11 +15,47 @@ let state = {
 document.addEventListener('DOMContentLoaded', () => {
   loadGroups();
 
-  // Register PWA Service Worker
+  // Register PWA Service Worker with Auto-Update Mechanism
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(err => {
+    navigator.serviceWorker.register('/sw.js').then((registration) => {
+      // 1. Immediately check for updates
+      registration.update();
+
+      // 2. Check for updates on visibility change / focus (when re-opening app)
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          registration.update();
+        }
+      });
+      window.addEventListener('focus', () => {
+        registration.update();
+      });
+
+      // 3. Periodic update check every 15 minutes
+      setInterval(() => {
+        registration.update();
+      }, 15 * 60 * 1000);
+    }).catch(err => {
       console.log('SW registration error:', err);
     });
+
+    // 4. When new service worker activates, auto-refresh page seamlessly once
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!refreshing) {
+        refreshing = true;
+        sessionStorage.setItem('just_updated', 'true');
+        window.location.reload();
+      }
+    });
+
+    // Notify user if app just auto-updated
+    if (sessionStorage.getItem('just_updated') === 'true') {
+      sessionStorage.removeItem('just_updated');
+      setTimeout(() => {
+        showToast('Aplicația s-a actualizat automat la cea mai nouă versiune! ✨', 'success');
+      }, 1000);
+    }
   }
 
   // Check if app is already installed or running in standalone mode
@@ -183,6 +219,12 @@ function renderStudentDashboard(student) {
     `Clasa Pregătitoare ${student.class_letter || ''}`.trim() : 
     `Clasa a ${student.class_grade}-a ${student.class_letter || ''}`.trim();
   document.getElementById('student-dash-class').innerText = `Înscris la: ${classLabel} • Telefon contact: ${student.parent_phone}`;
+
+  const schoolEl = document.getElementById('student-dash-school');
+  if (schoolEl) {
+    schoolEl.innerText = student.school_origin ? `🏫 Școala de proveniență: ${student.school_origin}` : '';
+    schoolEl.style.display = student.school_origin ? 'block' : 'none';
+  }
 
   document.getElementById('student-dash-group-name').innerText = student.group_name;
   document.getElementById('student-dash-group-level').innerText = `Nivel: ${student.group_class_label}`;
@@ -658,6 +700,7 @@ async function handleEnrollmentSubmit(e) {
   const firstName = document.getElementById('student-first-name').value.trim();
   const classGrade = document.getElementById('student-class-grade').value;
   const classLetter = document.getElementById('student-class-letter').value.trim();
+  const schoolOrigin = document.getElementById('student-school').value.trim();
   const parentPhone = document.getElementById('parent-phone').value.trim();
   const password = document.getElementById('student-password').value.trim();
   const groupId = document.getElementById('selected-group-id').value;
@@ -669,6 +712,11 @@ async function handleEnrollmentSubmit(e) {
 
   if (classGrade === '' || isNaN(classGrade)) {
     showError(errBox, 'Vă rugăm să selectați clasa elevului.');
+    return;
+  }
+
+  if (!schoolOrigin) {
+    showError(errBox, 'Vă rugăm să introduceți școala de proveniență (câmp obligatoriu).');
     return;
   }
 
@@ -699,6 +747,7 @@ async function handleEnrollmentSubmit(e) {
         first_name: firstName,
         class_grade: parseInt(classGrade, 10),
         class_letter: classLetter,
+        school_origin: schoolOrigin,
         parent_phone: parentPhone,
         password: password,
         group_id: parseInt(groupId, 10)
@@ -757,6 +806,10 @@ function showSuccessModal(student) {
         <div>
           <span style="color: var(--slate-500); font-size: 0.8rem; display:block;">Clasa:</span>
           <strong>${escapeHtml(clasaLabel)}</strong>
+        </div>
+        <div>
+          <span style="color: var(--slate-500); font-size: 0.8rem; display:block;">Școala:</span>
+          <strong>${escapeHtml(student.school_origin || '-')}</strong>
         </div>
         <div>
           <span style="color: var(--slate-500); font-size: 0.8rem; display:block;">Telefon Părinte:</span>
