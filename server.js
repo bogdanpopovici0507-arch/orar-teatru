@@ -723,7 +723,7 @@ app.get('/api/export-csv', requireAdminAuth, (req, res) => {
     csv += 'Nr. Crt.;Nume;Prenume;Clasa;Scoala de Provenienta;Telefon Parinte;Grupa;Zi;Interval Orar;Mentiune Elev;Data Inscrierii\r\n';
 
     students.forEach((s, idx) => {
-      const clasaDisplay = s.class_grade === 0 ? `Clasa Pregătitoare ${s.class_letter}`.trim() : `Clasa a ${s.class_grade}-a ${s.class_letter}`.trim();
+      const clasaDisplay = s.class_grade === 0 ? 'Clasa Pregătitoare (0)' : `Clasa a ${s.class_grade}-a`;
       const row = [
         idx + 1,
         `"${(s.last_name || '').replace(/"/g, '""')}"`,

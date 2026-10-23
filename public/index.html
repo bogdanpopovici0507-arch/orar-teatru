@@ -11,7 +11,7 @@
   <link rel="icon" href="/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/icon.svg">
   
-  <link rel="stylesheet" href="style.css?v=4">
+  <link rel="stylesheet" href="style.css?v=5">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -137,12 +137,6 @@
               <span class="form-hint" id="class-eligibility-hint">Selectați clasa pentru a evidenția grupele compatibile.</span>
             </div>
 
-            <div class="form-group">
-              <label for="student-class-letter">
-                Litera clasei <span style="font-weight: normal; color: var(--slate-500);">(opțional)</span>
-              </label>
-              <input type="text" id="student-class-letter" name="class_letter" placeholder="Ex: A, B, C" maxlength="5">
-            </div>
 
             <div class="form-group">
               <label for="student-school">
@@ -614,29 +608,23 @@
             <input type="text" id="edit-first-name" required>
           </div>
 
-          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
-            <div class="form-group">
-              <label for="edit-class-grade">Clasa:</label>
-              <select id="edit-class-grade" required>
-                <option value="0">Clasa Pregătitoare (0)</option>
-                <option value="1">Clasa I (1)</option>
-                <option value="2">Clasa a II-a (2)</option>
-                <option value="3">Clasa a III-a (3)</option>
-                <option value="4">Clasa a IV-a (4)</option>
-                <option value="5">Clasa a V-a (5)</option>
-                <option value="6">Clasa a VI-a (6)</option>
-                <option value="7">Clasa a VII-a (7)</option>
-                <option value="8">Clasa a VIII-a (8)</option>
-                <option value="9">Clasa a IX-a (9)</option>
-                <option value="10">Clasa a X-a (10)</option>
-                <option value="11">Clasa a XI-a (11)</option>
-                <option value="12">Clasa a XII-a (12)</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="edit-class-letter">Litera:</label>
-              <input type="text" id="edit-class-letter" maxlength="5">
-            </div>
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label for="edit-class-grade">Clasa: <span class="required">*</span></label>
+            <select id="edit-class-grade" required>
+              <option value="0">Clasa Pregătitoare (0)</option>
+              <option value="1">Clasa I (1)</option>
+              <option value="2">Clasa a II-a (2)</option>
+              <option value="3">Clasa a III-a (3)</option>
+              <option value="4">Clasa a IV-a (4)</option>
+              <option value="5">Clasa a V-a (5)</option>
+              <option value="6">Clasa a VI-a (6)</option>
+              <option value="7">Clasa a VII-a (7)</option>
+              <option value="8">Clasa a VIII-a (8)</option>
+              <option value="9">Clasa a IX-a (9)</option>
+              <option value="10">Clasa a X-a (10)</option>
+              <option value="11">Clasa a XI-a (11)</option>
+              <option value="12">Clasa a XII-a (12)</option>
+            </select>
           </div>
 
           <div class="form-group" style="margin-bottom: 0.85rem;">
@@ -761,29 +749,23 @@
             <input type="text" id="add-first-name" required placeholder="Prenume">
           </div>
 
-          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
-            <div class="form-group">
-              <label for="add-class-grade">Clasa: <span class="required">*</span></label>
-              <select id="add-class-grade" required>
-                <option value="0">Clasa Pregătitoare (0)</option>
-                <option value="1">Clasa I (1)</option>
-                <option value="2">Clasa a II-a (2)</option>
-                <option value="3">Clasa a III-a (3)</option>
-                <option value="4">Clasa a IV-a (4)</option>
-                <option value="5">Clasa a V-a (5)</option>
-                <option value="6">Clasa a VI-a (6)</option>
-                <option value="7">Clasa a VII-a (7)</option>
-                <option value="8">Clasa a VIII-a (8)</option>
-                <option value="9">Clasa a IX-a (9)</option>
-                <option value="10">Clasa a X-a (10)</option>
-                <option value="11">Clasa a XI-a (11)</option>
-                <option value="12">Clasa a XII-a (12)</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="add-class-letter">Litera:</label>
-              <input type="text" id="add-class-letter" maxlength="5" placeholder="ex: A">
-            </div>
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label for="add-class-grade">Clasa: <span class="required">*</span></label>
+            <select id="add-class-grade" required>
+              <option value="0">Clasa Pregătitoare (0)</option>
+              <option value="1">Clasa I (1)</option>
+              <option value="2">Clasa a II-a (2)</option>
+              <option value="3">Clasa a III-a (3)</option>
+              <option value="4">Clasa a IV-a (4)</option>
+              <option value="5">Clasa a V-a (5)</option>
+              <option value="6">Clasa a VI-a (6)</option>
+              <option value="7">Clasa a VII-a (7)</option>
+              <option value="8">Clasa a VIII-a (8)</option>
+              <option value="9">Clasa a IX-a (9)</option>
+              <option value="10">Clasa a X-a (10)</option>
+              <option value="11">Clasa a XI-a (11)</option>
+              <option value="12">Clasa a XII-a (12)</option>
+            </select>
           </div>
 
           <div class="form-group" style="margin-bottom: 0.85rem;">
@@ -924,7 +906,7 @@
   <div id="toast-container"></div>
 
   <!-- JavaScript Modules -->
-  <script src="app.js?v=4"></script>
-  <script src="admin.js?v=4"></script>
+  <script src="app.js?v=5"></script>
+  <script src="admin.js?v=5"></script>
 </body>
 </html>

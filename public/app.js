@@ -216,8 +216,8 @@ function renderStudentDashboard(student) {
   document.getElementById('student-dash-name').innerText = `${student.first_name} ${student.last_name}`;
   
   const classLabel = student.class_grade === 0 ? 
-    `Clasa Pregătitoare ${student.class_letter || ''}`.trim() : 
-    `Clasa a ${student.class_grade}-a ${student.class_letter || ''}`.trim();
+    'Clasa Pregătitoare (0)' : 
+    `Clasa a ${student.class_grade}-a (${student.class_grade})`;
   document.getElementById('student-dash-class').innerText = `Înscris la: ${classLabel} • Telefon contact: ${student.parent_phone}`;
 
   const schoolEl = document.getElementById('student-dash-school');
@@ -699,7 +699,6 @@ async function handleEnrollmentSubmit(e) {
   const lastName = document.getElementById('student-last-name').value.trim();
   const firstName = document.getElementById('student-first-name').value.trim();
   const classGrade = document.getElementById('student-class-grade').value;
-  const classLetter = document.getElementById('student-class-letter').value.trim();
   const schoolOrigin = document.getElementById('student-school').value.trim();
   const parentPhone = document.getElementById('parent-phone').value.trim();
   const password = document.getElementById('student-password').value.trim();
@@ -746,7 +745,6 @@ async function handleEnrollmentSubmit(e) {
         last_name: lastName,
         first_name: firstName,
         class_grade: parseInt(classGrade, 10),
-        class_letter: classLetter,
         school_origin: schoolOrigin,
         parent_phone: parentPhone,
         password: password,
@@ -794,8 +792,8 @@ function showSuccessModal(student) {
   const body = document.getElementById('success-modal-body');
   
   const clasaLabel = student.class_grade === 0 ? 
-    `Clasa Pregătitoare ${student.class_letter || ''}`.trim() : 
-    `Clasa a ${student.class_grade}-a ${student.class_letter || ''}`.trim();
+    'Clasa Pregătitoare (0)' : 
+    `Clasa a ${student.class_grade}-a (${student.class_grade})`;
 
   body.innerHTML = `
     <div style="background: var(--slate-50); border: 1.5px solid var(--slate-200); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem;">

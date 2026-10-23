@@ -175,8 +175,8 @@ function renderStudentsTable() {
   let html = '';
   students.forEach((s, index) => {
     const classDisplay = s.class_grade === 0 ? 
-      `Pregătitoare ${s.class_letter || ''}`.trim() : 
-      `Clasa a ${s.class_grade}-a ${s.class_letter || ''}`.trim();
+      'Pregătitoare (0)' : 
+      `Clasa a ${s.class_grade}-a`;
 
     html += `
       <tr>
@@ -400,7 +400,6 @@ function openEditStudentModal(studentId) {
   document.getElementById('edit-last-name').value = student.last_name;
   document.getElementById('edit-first-name').value = student.first_name;
   document.getElementById('edit-class-grade').value = student.class_grade;
-  document.getElementById('edit-class-letter').value = student.class_letter || '';
   document.getElementById('edit-school-origin').value = student.school_origin || '';
   document.getElementById('edit-parent-phone').value = student.parent_phone;
   document.getElementById('edit-group-id').value = student.group_id;
@@ -423,7 +422,6 @@ async function handleEditStudentSubmit(e) {
   const lastName = document.getElementById('edit-last-name').value.trim();
   const firstName = document.getElementById('edit-first-name').value.trim();
   const classGrade = parseInt(document.getElementById('edit-class-grade').value, 10);
-  const classLetter = document.getElementById('edit-class-letter').value.trim();
   const schoolOrigin = document.getElementById('edit-school-origin').value.trim();
   const parentPhone = document.getElementById('edit-parent-phone').value.trim();
   const groupId = parseInt(document.getElementById('edit-group-id').value, 10);
@@ -443,7 +441,6 @@ async function handleEditStudentSubmit(e) {
         last_name: lastName,
         first_name: firstName,
         class_grade: classGrade,
-        class_letter: classLetter,
         school_origin: schoolOrigin,
         parent_phone: parentPhone,
         group_id: groupId,
@@ -522,7 +519,6 @@ async function handleAddStudentSubmit(e) {
   const lastName = document.getElementById('add-last-name').value.trim();
   const firstName = document.getElementById('add-first-name').value.trim();
   const classGrade = parseInt(document.getElementById('add-class-grade').value, 10);
-  const classLetter = document.getElementById('add-class-letter').value.trim();
   const schoolOrigin = document.getElementById('add-school-origin').value.trim();
   const parentPhone = document.getElementById('add-parent-phone').value.trim();
   const groupId = parseInt(document.getElementById('add-group-id').value, 10);
@@ -540,7 +536,6 @@ async function handleAddStudentSubmit(e) {
         last_name: lastName,
         first_name: firstName,
         class_grade: classGrade,
-        class_letter: classLetter,
         school_origin: schoolOrigin,
         parent_phone: parentPhone,
         group_id: groupId,
